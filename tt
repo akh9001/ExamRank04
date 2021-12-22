@@ -1,0 +1,6 @@
+n = 2 l= 5
+[32mthis shouldn't appear 0, 1, -1, -1, /bin/ls!
+[0m####2
+n = 5 l= 5
+[32mthis shouldn't appear 4, 4, 3, 4, /usr/bin/grep!
+[0m
