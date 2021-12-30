@@ -19,6 +19,7 @@ void	ft_print_error(char *err, char *arg, int ext)
 	write(2, err, ft_srtlen(err));
 	if (arg)
 		write(2, arg, ft_srtlen(arg));
+	write(2, "\n", 1);
 	if (ext)
 		exit(1);
 }
