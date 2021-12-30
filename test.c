@@ -1,5 +1,7 @@
 #include <unistd.h>
 #include <stdlib.h>
+// #include <sys/types.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -28,17 +30,18 @@ int		cmd_handler(char **cmd, char **envp, int in, int out)
 	pid = fork();
 	if (!pid)
 	{
-		printf("in = %d, out = %d, cmd = %s\n", in, out, cmd[0]);
+		// printf("in = %d, out = %d, cmd = %s\n", in, out, cmd[0]);
 		dup2(in, 0);
 		dup2(out, 1);
-		if (!in)
+		if (in)
 			close(in);
 		if (out != 1)
 			close(out);
 		execve(cmd[0], cmd, envp);
 		ft_print_error("error: cannot execute ", cmd[0], 1);
 	}
-	if (!in)
+	// printf("########### in = %d, out =%d\n", in, out);
+	if (in)
 		close(in);
 	if (out != 1)
 		close(out);
@@ -78,6 +81,7 @@ void	pipe_handler(char **s, char **envp)
 			still_pipe = 1;
 			i++;
 			pipe(fd);
+			// printf("Pipe : fd[0] = %d, fd[1] = %d\n", fd[0], fd[1]);
 			out = fd[1];
 		}
 		int pid = cmd_handler(cmd, envp, in, out);
