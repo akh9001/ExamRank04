@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   microshell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akhalidy <akhalidy@student.42.fr>          +#+  +:+       +#+        */
+/*   By: elona <elona@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/11 19:30:35 by akhalidy          #+#    #+#             */
-/*   Updated: 2022/02/12 22:11:32 by akhalidy         ###   ########.fr       */
+/*   Updated: 2022/03/05 00:01:41 by elona            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,10 @@ void	ft_print_error(char *err, char *cmd, int exiit)
 void	ft_cd(char **path)
 {
 	if (!*(path + 1) || *(path + 2))
-		ft_print_error("error: cd: bad arguments", NULL, 1);
-	if (chdir(*(path + 1)) == -1)
-		ft_print_error("error: cd: cannot change directory to ", *(path + 1), 1);
+		ft_print_error("error: cd: bad arguments", NULL, 0);
+	else
+		if (chdir(*(path + 1)) == -1)
+			ft_print_error("error: cd: cannot change directory to ", *(path + 1), 0);
 }
 
 void	cmd_handler(char **cmd, char **envp, int in, int out, int fd[2])
@@ -49,19 +50,15 @@ void	cmd_handler(char **cmd, char **envp, int in, int out, int fd[2])
 	pid = fork();
 	if (pid == -1)
 		ft_print_error("error: fatal", NULL, 1);
-	//! fprintf(stderr, "\033[0;31m %s +++++ %s \033[0m\n", cmd[0], cmd[1]);
 	if (!pid)
 	{
 		dup2(in, 0);
 		dup2(out, 1);
 		if (in)
 			close(in);
-		// else // I guess i should remove this else
 		close(fd[0]);
 		if (out != 1)
 			close(out);
-		// else
-		// 	close(fd[1]);
 		execve(cmd[0], cmd, envp);
 		ft_print_error("error: cannot execute ", cmd[0], 1);
 	}
@@ -70,8 +67,6 @@ void	cmd_handler(char **cmd, char **envp, int in, int out, int fd[2])
 		close(in);
 	if (out != 1)
 		close(out);
-	// else
-	// 	close (fd[1]);
 }
 
 void	pipe_handler(char **av, char **envp)
@@ -84,7 +79,7 @@ void	pipe_handler(char **av, char **envp)
 	while (still_pipe)
 	{
 		j = 0;
-		char *cmd[500];
+		char *cmd[10000];
 		while (av[i] && strcmp(av[i], "|"))
 		{
 			cmd[j] = av[i];
@@ -114,7 +109,7 @@ void	comma_handler(char **av, char **envp)
 
 	while(still_comma)
 	{
-		char *cmd[5000];
+		char *cmd[10000];
 		j = 0;
 		while (av[i] && strcmp(av[i], ";"))
 		{
@@ -124,14 +119,11 @@ void	comma_handler(char **av, char **envp)
 		}
 		cmd[j] = NULL;
 		still_comma = 0;
-			//! write(1, "\033[0;32m Ba3ouuuuda \033[0m\n", ft_strlen("\033[0;32m Ba3ouuuuda \033[0m\n"));
-		//!fprintf(stderr, "\033[0;32m %d %s 11111 %s \033[0m\n", i, av[i], cmd[1]);
 		if (av[i])
 		{
 			still_comma = 1;
 			i++;
 		}
-		//!fprintf(stderr, "\033[0;31m %d %s 22222 %s \033[0m\n", i, cmd[0], cmd[1]);
 		if (cmd[0])
 		{
 			if (!strcmp(cmd[0], "cd"))
